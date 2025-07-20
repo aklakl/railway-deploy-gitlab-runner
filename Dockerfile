@@ -10,6 +10,9 @@ RUN apt-get update && apt-get install -y \
     ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
+RUN apt-get update && apt-get install -y git bind-tools nmap netcat-openbsd
+
+
 # Download and install the latest version of GitLab Runner for Linux amd64
 RUN curl -L --output /usr/local/bin/gitlab-runner "https://s3.dualstack.us-east-1.amazonaws.com/gitlab-runner-downloads/latest/binaries/gitlab-runner-linux-amd64"
 RUN chmod +x /usr/local/bin/gitlab-runner
