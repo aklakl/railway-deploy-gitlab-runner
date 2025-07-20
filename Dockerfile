@@ -10,7 +10,7 @@ RUN apt-get update && apt-get install -y \
     ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
-RUN apt-get update && apt-get install -y git bind-tools nmap netcat-openbsd
+RUN apt-get update && apt-get install -y git dnsutils bind9-dnsutils nmap netcat-openbsd
 
 
 # Download and install the latest version of GitLab Runner for Linux amd64
