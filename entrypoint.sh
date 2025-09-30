@@ -1,24 +1,34 @@
 #!/bin/bash
 set -e
 
-# This is where the Runner configuration file is stored
-CONFIG_FILE=/etc/gitlab-runner/config.toml
+# Define the path for the configuration file
+CONFIG_FILE="/etc/gitlab-runner/config.toml"
 
-# Check if the configuration file already exists. If it does, the Runner has already been registered.
+# Register the runner only if the configuration file doesn't exist
 if [ ! -f "$CONFIG_FILE" ]; then
-  echo ">>> Configuration file not found, registering Runner for the first time..."
+  echo ">>> First time setup: Registering GitLab Runner..."
+  
+  # Ensure all required environment variables are set
+  if [ -z "$REGISTRATION_TOKEN" ] || [ -z "$CI_SERVER_URL" ]; then
+    echo "Error: REGISTRATION_TOKEN and CI_SERVER_URL environment variables must be set."
+    exit 1
+  fi
+
+  # Run the registration command
   gitlab-runner register \
     --non-interactive \
-    --url "$GITLAB_URL" \
-    --registration-token "$GITLAB_RUNNER_TOKEN" \
-    --executor "shell" \
-    --description "$RUNNER_DESCRIPTION" \
-    --tag-list "$RUNNER_TAGS" \
+    --url "$CI_SERVER_URL" \
+    --token "$REGISTRATION_TOKEN" \
+    --executor "docker" \
+    --docker-image "docker:stable" \
+    --docker-privileged \
+    --docker-volumes "/certs/client" \
+    --description "${RUNNER_DESCRIPTION:-Railway Docker Runner}" \
+    --tag-list "${RUNNER_TAG_LIST:-docker,railway}" \
     --run-untagged="true" \
     --locked="false" \
     --access-level="not_protected"
 fi
-
 
 echo ">>> Setting concurrent limit to 10 in config.toml..."
 # Use sed to find lines starting with 'concurrent =' and replace them with 'concurrent = 10'
@@ -31,6 +41,6 @@ else
 fi
 # ------------------------------
 
-# Start the Runner service, it will begin pulling jobs from GitLab
+# Start the GitLab Runner service with the command provided to the entrypoint
 echo ">>> Starting GitLab Runner..."
-exec gitlab-runner run
+exec gitlab-runner "$@"
