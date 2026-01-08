@@ -2,7 +2,7 @@ FROM gitlab/gitlab-runner:ubuntu
 
 # Install basic dependencies and Node.js 20
 # We pre-install pnpm here so you don't need to install it in every CI job
-RUN apt-get update && apt-get install -y curl git bash tree jq \
+RUN apt-get update && apt-get install -y curl git bash tree jq rsync \
  && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
  && apt-get install -y nodejs \
  && npm install -g pnpm \
