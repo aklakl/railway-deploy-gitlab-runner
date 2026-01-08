@@ -5,13 +5,12 @@ CONFIG_FILE="/etc/gitlab-runner/config.toml"
 
 echo "🚀 GitLab Runner starting..."
 
-
 if [ -z "$GITLAB_URL" ] || [ -z "$REGISTRATION_TOKEN" ]; then
   echo "❌ GITLAB_URL or REGISTRATION_TOKEN is missing"
   exit 1
 fi
 
-
+# Register Runner (if config does not exist)
 if [ ! -f "$CONFIG_FILE" ]; then
   echo "🔐 Registering GitLab Runner..."
 
@@ -32,7 +31,10 @@ fi
 
 echo "Node version: $(node -v)"
 echo "NPM version: $(npm -v)"
+echo "PNPM version: $(pnpm -v)"
 
+echo "🏃 Running GitLab Runner as ROOT..."
 
-echo "🏃 Running GitLab Runner..."
-exec gitlab-runner run --user=gitlab-runner --working-directory=/home/gitlab-runner
+# 🔥 [CRITICAL CHANGE] Run as root user to fix permission errors
+# Changed working directory to /root
+exec gitlab-runner run --user=root --working-directory=/root
