@@ -1,36 +1,35 @@
 #!/bin/bash
 set -e
 
-# This is where the Runner configuration file is stored
-CONFIG_FILE=/etc/gitlab-runner/config.toml
+CONFIG_FILE="/etc/gitlab-runner/config.toml"
 
-# Check if the configuration file already exists. If it does, the Runner has already been registered.
+echo "🚀 GitLab Runner starting..."
+
+
+if [ -z "$GITLAB_URL" ] || [ -z "$REGISTRATION_TOKEN" ]; then
+  echo "❌ GITLAB_URL or REGISTRATION_TOKEN is missing"
+  exit 1
+fi
+
+
 if [ ! -f "$CONFIG_FILE" ]; then
-  echo ">>> Configuration file not found, registering Runner for the first time..."
+  echo "🔐 Registering GitLab Runner..."
+
   gitlab-runner register \
     --non-interactive \
     --url "$GITLAB_URL" \
-    --registration-token "$GITLAB_RUNNER_TOKEN" \
-    --executor "shell" \
-    --description "$RUNNER_DESCRIPTION" \
+    --registration-token "$REGISTRATION_TOKEN" \
+    --executor shell \
+    --name "$RUNNER_NAME" \
     --tag-list "$RUNNER_TAGS" \
     --run-untagged="true" \
-    --locked="false" \
-    --access-level="not_protected"
-fi
+    --locked="false"
 
-
-echo ">>> Setting concurrent limit to 10 in config.toml..."
-# Use sed to find lines starting with 'concurrent =' and replace them with 'concurrent = 10'
-# Ensure the file exists and is writable
-if [ -f "$CONFIG_FILE" ]; then
-  sed -i 's/^concurrent = .*/concurrent = 10/' "$CONFIG_FILE"
-  echo ">>> config.toml updated with concurrent = 10."
+  echo "✅ Runner registered"
 else
-  echo "WARNING: config.toml not found after registration. Concurrent setting might not be applied."
+  echo "ℹ️ Runner already registered"
 fi
-# ------------------------------
 
-# Start the Runner service, it will begin pulling jobs from GitLab
-echo ">>> Starting GitLab Runner..."
-exec gitlab-runner run
+
+echo "🏃 Running GitLab Runner..."
+exec gitlab-runner run --user=gitlab-runner --working-directory=/home/gitlab-runner
