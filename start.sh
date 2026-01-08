@@ -30,6 +30,9 @@ else
   echo "ℹ️ Runner already registered"
 fi
 
+echo "Node version: $(node -v)"
+echo "NPM version: $(npm -v)"
+
 
 echo "🏃 Running GitLab Runner..."
 exec gitlab-runner run --user=gitlab-runner --working-directory=/home/gitlab-runner
