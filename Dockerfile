@@ -1,8 +1,10 @@
-FROM gitlab/gitlab-runner:alpine
+FROM gitlab/gitlab-runner:ubuntu
 
 
-RUN apk add --no-cache bash
-
+RUN apt-get update \
+ && apt-get install -y tree jq \
+ && rm -rf /var/lib/apt/lists/*
+    
 WORKDIR /
 
 COPY start.sh /start.sh
