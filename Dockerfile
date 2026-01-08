@@ -1,6 +1,13 @@
 FROM gitlab/gitlab-runner:alpine
 
-# Make sure runner folder existing
+
+RUN apk add --no-cache bash
+
+
+COPY start.sh /start.sh
+RUN chmod +x /start.sh
+
+
 RUN mkdir -p /etc/gitlab-runner
 
-CMD ["gitlab-runner", "run", "--user=gitlab-runner", "--working-directory=/home/gitlab-runner"]
+CMD ["/start.sh"]
