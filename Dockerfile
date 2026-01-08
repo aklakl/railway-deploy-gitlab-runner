@@ -9,6 +9,10 @@ RUN apt-get update && apt-get install -y curl git bash tree jq \
     
 WORKDIR /
 
+# ✅ Enable Corepack and active pnpm
+RUN corepack enable \
+ && corepack prepare pnpm@latest --activate
+
 COPY start.sh /start.sh
 RUN chmod +x /start.sh
 
